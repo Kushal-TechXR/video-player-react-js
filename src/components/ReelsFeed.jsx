@@ -2,10 +2,15 @@ import React, { useMemo } from 'react';
 import ReelItem from './ReelItem';
 
 export default function ReelsFeed() {
-  // Get video ID from URL parameter
-  const videoId = useMemo(() => {
+  // Get video ID and autoplay from URL parameters
+  const { videoId, autoplay } = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('id');
+    const id = params.get('id');
+    const autoplayParam = params.get('autoplay');
+    return {
+      videoId: id,
+      autoplay: autoplayParam === 'true'
+    };
   }, []);
 
   if (!videoId) {
@@ -15,7 +20,7 @@ export default function ReelsFeed() {
   return (
     <main className="reels-container">
       <div className="reel-item">
-        <ReelItem videoId={videoId} />
+        <ReelItem videoId={videoId} autoplay={autoplay} />
       </div>
     </main>
   );
