@@ -60,7 +60,7 @@ const YouTubePlayer = forwardRef(function YouTubePlayer(
         onReady: (e) => {
           // Play video with audio enabled
           try {
-            e.target.playVideo();
+            // e.target.playVideo();
           } catch (_) {}
           if (onPlayerReady) onPlayerReady(e);
         }
@@ -80,10 +80,30 @@ const YouTubePlayer = forwardRef(function YouTubePlayer(
       try {
         const data = JSON.parse(event.data);
         
-        if (data.action === 'play' && playerRef.current) {
-          playerRef.current.playVideo();
-        } else if (data.action === 'pause' && playerRef.current) {
-          playerRef.current.pauseVideo();
+        if (playerRef.current && data.action) {
+          switch (data.action) {
+            case 'play':
+              playerRef.current.playVideo();
+              break;
+            case 'pause':
+              playerRef.current.pauseVideo();
+              break;
+            case 'unmute':
+              playerRef.current.unMute();
+              break;
+            case 'mute':
+              playerRef.current.mute();
+              break;
+            case 'seekTo':
+              playerRef.current.seekTo(data.time);
+              break;
+            case 'setVolume':
+              playerRef.current.setVolume(data.volume);
+              break;
+            default:
+              // No action
+              break;
+          }
         }
       } catch (e) {
         // Ignore non-JSON messages
