@@ -43,7 +43,7 @@ const YouTubePlayer = forwardRef(function YouTubePlayer(
       height: '100%',
       videoId,
       playerVars: {
-        autoplay: 0,
+        autoplay: 1,
         mute: 0,
         controls: 0,
         playsinline: 0,
@@ -94,6 +94,53 @@ const YouTubePlayer = forwardRef(function YouTubePlayer(
     
     return () => {
       window.removeEventListener('message', handleMessage);
+    };
+  }, []);
+
+  // Handle click events to toggle play/pause
+  useEffect(() => {
+    const handleClick = () => {
+      if (!playerRef.current) return;
+      try {
+        const playerState = playerRef.current.getPlayerState();
+        // PlayerState: -1 (unstarted), 0 (ended), 1 (playing), 2 (paused), 3 (buffering), 5 (cued)
+        if (playerState === 1) {
+          playerRef.current.pauseVideo();
+        } else if (playerState === 2 || playerState === -1 || playerState === 0 || playerState === 5) {
+          playerRef.current.playVideo();
+        }
+      } catch (_) {}
+    };
+
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('click', handleClick);
+      return () => {
+        container.removeEventListener('click', handleClick);
+      };
+    }
+  }, []);
+
+  // Handle visibility change events (pause when tab is hidden, resume when visible)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!playerRef.current) return;
+      try {
+        if (document.hidden) {
+          playerRef.current.pauseVideo();
+        } else {
+          const playerState = playerRef.current.getPlayerState();
+          // Only resume if it was playing before
+          if (playerState === 2) {
+            playerRef.current.playVideo();
+          }
+        }
+      } catch (_) {}
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
 
