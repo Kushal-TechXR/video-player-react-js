@@ -1,7 +1,7 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import YouTubePlayer from './YouTubePlayer';
 
-const ReelItem = forwardRef(function ReelItem({ videoId }, ref) {
+const ReelItem = forwardRef(function ReelItem({ videoId, autoplay = false }, ref) {
   const playerRef = useRef(null);
 
   useImperativeHandle(ref, () => ({
@@ -12,7 +12,7 @@ const ReelItem = forwardRef(function ReelItem({ videoId }, ref) {
 
   return (
     <section className="reel-item">
-      <YouTubePlayer ref={playerRef} videoId={videoId} className="yt-frame" />
+      <YouTubePlayer ref={playerRef} videoId={videoId} autoplay={autoplay} className="yt-frame" />
     </section>
   );
 });

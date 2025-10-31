@@ -28,7 +28,7 @@ function useYouTubeApi() {
 }
 
 const YouTubePlayer = forwardRef(function YouTubePlayer(
-  { videoId, className, onReady: onPlayerReady },
+  { videoId, className, onReady: onPlayerReady, autoplay = false },
   ref
 ) {
   const apiReady = useYouTubeApi();
@@ -43,7 +43,7 @@ const YouTubePlayer = forwardRef(function YouTubePlayer(
       height: '100%',
       videoId,
       playerVars: {
-        autoplay: 1,            // Automatically start playing the video when the player loads (1 = enabled)
+        autoplay: autoplay ? 1 : 0,  // Automatically start playing the video when the player loads (1 = enabled, 0 = disabled)
         mute: 0,                // Do not mute the video on start (0 = sound on)
         controls: 0,            // Hide the player controls (0 = no controls)
         playsinline: 1,         // Play the video inline on mobile devices instead of fullscreen (1 = inline)
@@ -58,10 +58,12 @@ const YouTubePlayer = forwardRef(function YouTubePlayer(
       },
       events: {
         onReady: (e) => {
-          // Play video with audio enabled
-          try {
-            // e.target.playVideo();
-          } catch (_) {}
+          // Play video if autoplay is enabled
+          if (autoplay) {
+            try {
+              e.target.playVideo();
+            } catch (_) {}
+          }
           if (onPlayerReady) onPlayerReady(e);
         }
       }
@@ -73,7 +75,7 @@ const YouTubePlayer = forwardRef(function YouTubePlayer(
       } catch (_) {}
       playerRef.current = null;
     };
-  }, [apiReady, videoId, onPlayerReady]);
+  }, [apiReady, videoId, onPlayerReady, autoplay]);
 
   useEffect(() => {
     const handleMessage = (event) => {
