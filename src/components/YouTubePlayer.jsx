@@ -44,7 +44,7 @@ const YouTubePlayer = forwardRef(function YouTubePlayer(
       videoId,
       playerVars: {
         autoplay: 1,
-        mute: 1,
+        mute: 0,
         controls: 0,
         playsinline: 1,
         modestbranding: 1,
@@ -58,9 +58,8 @@ const YouTubePlayer = forwardRef(function YouTubePlayer(
       },
       events: {
         onReady: (e) => {
-          // Ensure muted inline autoplay
+          // Play video with audio enabled
           try {
-            e.target.mute();
             e.target.playVideo();
           } catch (_) {}
           if (onPlayerReady) onPlayerReady(e);
@@ -80,7 +79,6 @@ const YouTubePlayer = forwardRef(function YouTubePlayer(
     play: () => {
       if (!playerRef.current) return;
       try {
-        playerRef.current.mute();
         playerRef.current.playVideo();
       } catch (_) {}
     },
