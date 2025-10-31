@@ -75,6 +75,28 @@ const YouTubePlayer = forwardRef(function YouTubePlayer(
     };
   }, [apiReady, videoId, onPlayerReady]);
 
+  useEffect(() => {
+    const handleMessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        
+        if (data.action === 'play' && playerRef.current) {
+          playerRef.current.playVideo();
+        } else if (data.action === 'pause' && playerRef.current) {
+          playerRef.current.pauseVideo();
+        }
+      } catch (e) {
+        // Ignore non-JSON messages
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, []);
+
   useImperativeHandle(ref, () => ({
     play: () => {
       if (!playerRef.current) return;
