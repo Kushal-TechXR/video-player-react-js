@@ -43,17 +43,17 @@ const YouTubePlayer = forwardRef(function YouTubePlayer(
       height: '100%',
       videoId,
       playerVars: {
-        autoplay: 1,
+        autoplay: 0,
         mute: 0,
         controls: 0,
-        playsinline: 1,
-        modestbranding: 1,
+        playsinline: 0,
+        modestbranding: 0,
         rel: 0,
-        iv_load_policy: 3,
+        iv_load_policy: 3, 
         fs: 0,
         disablekb: 1,
         loop: 1,
-        playlist: videoId,
+        // playlist: videoId, 
         origin: window.location.origin
       },
       events: {
