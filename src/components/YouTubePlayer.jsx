@@ -43,18 +43,18 @@ const YouTubePlayer = forwardRef(function YouTubePlayer(
       height: '100%',
       videoId,
       playerVars: {
-        autoplay: 1,
-        mute: 0,
-        controls: 0,
-        playsinline: 0,
-        modestbranding: 0,
-        rel: 0,
-        iv_load_policy: 3, 
-        fs: 0,
-        disablekb: 1,
-        loop: 1,
-        // playlist: videoId, 
-        origin: window.location.origin
+        autoplay: 1,            // Automatically start playing the video when the player loads (1 = enabled)
+        mute: 0,                // Do not mute the video on start (0 = sound on)
+        controls: 0,            // Hide the player controls (0 = no controls)
+        playsinline: 1,         // Play the video inline on mobile devices instead of fullscreen (1 = inline)
+        modestbranding: 0,      // Display the standard YouTube branding (0 = show logo in video)
+        rel: 0,                 // Do not show related videos from other channels at the end (0 = related videos from same channel only)
+        iv_load_policy: 3,      // Hide video annotations by default (3 = annotations off)
+        fs: 1,                  // Allow the fullscreen button to appear and be used (1 = allowed)
+        disablekb: 1,           // Disable keyboard controls to interact with the player (1 = disabled)
+        loop: 1,                // Enable looping of the video (1 = loop enabled)
+        // playlist: videoId,   // (commented out) Would be used for looping the current video
+        origin: window.location.origin // Set the origin for security and to enable certain features (identifies the site)
       },
       events: {
         onReady: (e) => {
