@@ -34,6 +34,17 @@ const YouTubePlayer = forwardRef(function YouTubePlayer(
   const apiReady = useYouTubeApi();
   const containerRef = useRef(null);
   const playerRef = useRef(null);
+  const [showThumbnail, setShowThumbnail] = useState(true);
+
+  // Generate YouTube thumbnail URL
+  const thumbnailUrl = videoId 
+    ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+    : null;
+
+  // Reset thumbnail visibility when videoId changes
+  useEffect(() => {
+    setShowThumbnail(true);
+  }, [videoId]);
 
   useEffect(() => {
     if (!apiReady || !containerRef.current || playerRef.current) return;
@@ -65,6 +76,12 @@ const YouTubePlayer = forwardRef(function YouTubePlayer(
             } catch (_) {}
           }
           if (onPlayerReady) onPlayerReady(e);
+        },
+        onStateChange: (e) => {
+          // Hide thumbnail when video starts playing (state === 1)
+          if (e.data === 1) {
+            setShowThumbnail(false);
+          }
         }
       }
     });
@@ -194,7 +211,27 @@ const YouTubePlayer = forwardRef(function YouTubePlayer(
       title="YouTube video player"
       role="region"
       aria-label="YouTube video"
-    />
+      style={{ position: 'relative' }}
+    >
+      {showThumbnail && thumbnailUrl && (
+        <img
+          src={thumbnailUrl}
+          alt="Video thumbnail"
+          className="youtube-thumbnail"
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            backgroundColor: '#000',
+            zIndex: 1,
+            pointerEvents: 'none'
+          }}
+        />
+      )}
+    </div>
   );
 });
 
