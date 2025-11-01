@@ -97,9 +97,10 @@ const YouTubePlayer = forwardRef(function YouTubePlayer(
   useEffect(() => {
     const handleMessage = (event) => {
       try {
-        const data = JSON.parse(event.data);
-        
-        if (playerRef.current && data.action) {
+        const raw = event?.data;
+        const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
+
+        if (playerRef.current && data?.action) {
           switch (data.action) {
             case 'play':
               playerRef.current.playVideo();
@@ -114,25 +115,26 @@ const YouTubePlayer = forwardRef(function YouTubePlayer(
               playerRef.current.mute();
               break;
             case 'seekTo':
-              playerRef.current.seekTo(data.time);
+              if (typeof data.time === 'number') playerRef.current.seekTo(data.time);
               break;
             case 'setVolume':
-              playerRef.current.setVolume(data.volume);
+              if (typeof data.volume === 'number') playerRef.current.setVolume(data.volume);
               break;
             default:
-              // No action
               break;
           }
         }
-      } catch (e) {
-        // Ignore non-JSON messages
+      } catch (_) {
+        // ignore
       }
     };
 
-    window.addEventListener('message', handleMessage);
-    
+    window.addEventListener('message', handleMessage);   // iOS
+    document.addEventListener('message', handleMessage); // Android
+
     return () => {
       window.removeEventListener('message', handleMessage);
+      document.removeEventListener('message', handleMessage);
     };
   }, []);
 
