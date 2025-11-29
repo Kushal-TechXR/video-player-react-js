@@ -72,7 +72,7 @@ function App() {
         setLoading(true);
         
         const response = await fetch(
-          `https://devgateway.techxrdev.in/api/content/content/reels/feed?category=${category}&page=1&limit=10&userId=12`,
+          `https://devgateway.techxrdev.in/api/content/content/reels/feed?category=${category}&page=1&limit=50&userId=12`,
           {
             headers: {
               'Authorization': `Bearer ${authToken}`
