@@ -1,0 +1,65 @@
+/* Category selector tabs */
+.category-tabs {
+    position: fixed;
+    right: 16px;
+    bottom: 80px;              /* move up from bottom so last button is visible */
+    display: flex;
+    flex-direction: column;    /* stack vertically */
+    gap: 1.2rem;
+    align-items: flex-end;     /* text hugs the right side */
+    z-index: 10000;
+  }
+  
+  /* whole clickable row: circle + label */
+  .category-tab {
+    
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  
+    display: flex;
+    flex-direction: column;
+    align-items: center;      /* keep icon + label centered together */
+    justify-content: center;
+    gap: 0.4rem;
+    color: #ffffff;
+    font-size: 10px;
+  }
+  
+  /* circular icon */
+  .category-tab-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    background: rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: right;
+    justify-content: right;
+  }
+  
+  /* label text */
+  .category-tab-label {
+    text-shadow: 0 0 6px rgba(0, 0, 0, 0.7);
+    margin-top:-2px;
+  }
+  
+  /* active (like orange Stories button) */
+  .category-tab.active .category-tab-icon {
+    background: #ff9f1c;        /* adjust to your orange */
+    border-color: #ff9f1c;
+  }
+  
+  .category-tab.active .category-tab-label {
+    font-weight: 600;
+  }
+  
+  .category-tab-icon-img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+    object-position: center;
+    padding: 4px;
+    
+  }
