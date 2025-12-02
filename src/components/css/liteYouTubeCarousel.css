@@ -1,0 +1,243 @@
+/* Lite YouTube Carousel - Optimized for Speed */
+.lite-yt-container {
+  position: relative;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  background: #0f0f0f;
+}
+
+.lite-yt-track {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+  touch-action: pan-y;
+}
+
+.lite-yt-slide {
+  position: relative;
+  flex-shrink: 0;
+  width: 100vw;
+  background: #0f0f0f;
+  overflow: hidden;
+  cursor: grab;
+}
+
+.lite-yt-slide:active {
+  cursor: grabbing;
+}
+
+/* Item wrapper */
+.lite-yt-item-wrapper {
+  position: relative;
+  width: 100%;
+  background: #000;
+  overflow: hidden;
+}
+
+/* Player container */
+.lite-yt-player {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Override lite-youtube-embed styles for vertical video */
+.lite-yt-wrapper {
+  width: 100% !important;
+  height: 100% !important;
+  aspect-ratio: auto !important;
+  max-width: none !important;
+}
+
+.lite-yt-wrapper::before {
+  display: none !important;
+}
+
+.lite-yt-wrapper > iframe {
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+
+/* Thumbnail styling */
+.lite-yt-wrapper > picture > img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+/* Play button styling */
+.lite-yt-wrapper .lty-playbtn {
+  width: 68px !important;
+  height: 48px !important;
+  background-color: #f00 !important;
+  z-index: 10 !important;
+  border-radius: 14% !important;
+  transition: transform 0.2s ease, opacity 0.2s ease !important;
+}
+
+.lite-yt-wrapper:hover .lty-playbtn {
+  transform: translate(-50%, -50%) scale(1.1) !important;
+}
+
+.lite-yt-wrapper.lyt-activated .lty-playbtn {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Skeleton loading */
+.lite-yt-skeleton {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 50%, #1a1a1a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lite-yt-skeleton-shimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.02) 20%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.02) 80%,
+    transparent 100%
+  );
+  animation: lite-shimmer 2s infinite;
+}
+
+@keyframes lite-shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Index badge */
+.lite-yt-index {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 20;
+  backdrop-filter: blur(8px);
+}
+
+/* Progress indicator */
+.lite-yt-progress {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+
+/* Navigation dots */
+.lite-yt-dots {
+  position: fixed;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 100;
+  align-items: center;
+}
+
+.lite-yt-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lite-yt-dot.active {
+  background: #FF0000;
+  transform: scale(1.3);
+}
+
+.lite-yt-dot:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.lite-yt-more {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 10px;
+  margin-top: 4px;
+}
+
+/* Empty state */
+.lite-yt-empty {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0f0f0f;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .lite-yt-progress {
+    top: 16px;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .lite-yt-dots {
+    right: 8px;
+    gap: 6px;
+  }
+
+  .lite-yt-dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .lite-yt-index {
+    top: 12px;
+    left: 12px;
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .lite-yt-skeleton-shimmer {
+    animation: none;
+  }
+  
+  .lite-yt-dot,
+  .lite-yt-wrapper .lty-playbtn {
+    transition: none !important;
+  }
+}

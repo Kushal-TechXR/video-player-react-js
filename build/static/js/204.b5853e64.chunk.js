@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkreels_app=self.webpackChunkreels_app||[]).push([[204],{204:(e,s,t)=>{t.r(s),t.d(s,{AudioProvider:()=>u});var i=t(705),r=t(180),p=t(408);t(43);class u extends p.BS{get type(){return"audio"}constructor(e,s){super(e,s),(0,i.A)(this,"$$PROVIDER_TYPE","AUDIO"),(0,i.A)(this,"airPlay",void 0),(0,r.P1)(()=>{this.airPlay=new p.zn(this.media,s)},this.scope)}setup(){super.setup(),"audio"===this.type&&this.ctx.notify("provider-setup",this)}get audio(){return this.media}}}}]);
-//# sourceMappingURL=204.b5853e64.chunk.js.map
