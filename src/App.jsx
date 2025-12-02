@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import './App.css';
-import Carousel from './components/carousel';
 import CategoryTabs from './components/categoriesTab';
+import TEST from './TEST';
 
 // Style constants to avoid recreating on every render
 const FULL_SCREEN_STYLES = {
@@ -39,7 +39,6 @@ const NO_REELS_STYLES = {
 const CONTAINER_STYLES = {
   width: '100vw',
   height: '100vh',
-  overflow: 'hidden',
   margin: 0,
   padding: 0,
   top: 0,
@@ -54,17 +53,6 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [category, setCategory] = useState('Stories');
-  const [windowHeight, setWindowHeight] = useState(() => typeof window !== 'undefined' ? window.innerHeight : 300);
-
-  // Handle window resize for baseWidth calculation
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowHeight(window.innerHeight);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -142,11 +130,7 @@ function App() {
         category={category} 
         onChange={handleCategoryChange}
       />
-      <Carousel 
-        key={category}
-        baseWidth={windowHeight}
-        items={videoUrls}
-      />
+      <TEST videoUrls={videoUrls} />
     </div>
   );
 }
