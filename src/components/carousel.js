@@ -12,7 +12,7 @@ import './css/carousel.css';
 
 
 
-const DRAG_BUFFER = 100;
+const DRAG_BUFFER = 200;
 const VELOCITY_THRESHOLD = 300;
 const GAP = 0;
 const SPRING_OPTIONS = { type: 'tween', duration: 0.5, ease: 'easeOut' };
@@ -62,7 +62,6 @@ export default function Carousel({
   const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef(null);
   const isDragging = useRef(false);
-  const playerRef = useRef(null);
 
   const itemsLength = items.length;
 
@@ -181,7 +180,6 @@ export default function Carousel({
             >
 
               <MediaPlayer
-                ref={playerRef}
                 src={item}
                 paused={!(index === effectiveIndex)}
                 autoPlay
@@ -200,18 +198,26 @@ export default function Carousel({
                     nativeEvent.target.exitFullscreen();
                   }
                 }}
-                onDoubleClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  console.log('double click');
-                }}
-                fullscreenOrientation='portrait'
+                fullscreenOrientation="portrait"
                 onCanPlay={(detail, nativeEvent) => {
-                  // Access qualities and set auto
                   const player = nativeEvent.target;
-                  if (player && player.qualities && player.qualities.length > 0) {
-                    player.qualities.autoSelect();
+                  const qualities = player?.qualities;
+
+                  if (!qualities || qualities.length === 0) return;
+
+                  let mediumIndex = 0;
+
+                  if (qualities.length === 1) {
+                    mediumIndex = 0;
+                  } else if (qualities.length === 2) {
+                    // For two qualities, choose the lower (non-highest) quality.
+                    mediumIndex = 1;
+                  } else {
+                    // For 3+ qualities, choose a middle quality (not the highest).
+                    mediumIndex = Math.floor(qualities.length / 2);
                   }
+
+                  qualities.selectedIndex = mediumIndex;
                 }}
               >
                 <MediaProvider />
