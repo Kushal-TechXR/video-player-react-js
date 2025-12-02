@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import './App.css';
-import Carousel from './components/carousel';
+import OptimizedCarousel from './components/OptimizedCarousel';
 import CategoryTabs from './components/categoriesTab';
 
 // Style constants to avoid recreating on every render
@@ -18,6 +18,8 @@ const LOADING_STYLES = {
   color: '#fff',
   fontSize: '24px',
   zIndex: 1,
+  flexDirection: 'column',
+  gap: '16px',
 };
 
 const ERROR_STYLES = {
@@ -47,7 +49,31 @@ const CONTAINER_STYLES = {
   position: 'fixed',
   zIndex: 1,
 };
+
+const SPINNER_STYLES = {
+  width: '40px',
+  height: '40px',
+  border: '3px solid rgba(255, 255, 255, 0.1)',
+  borderTopColor: '#ff9f1c',
+  borderRadius: '50%',
+  animation: 'spin 0.8s linear infinite',
+};
+
 const authToken = `eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjUwODk4MzcsInVzZXJfbmFtZSI6IjI2NyIsImF1dGhvcml0aWVzIjpbIlJPTEVfRERBUFBfVVNFUiIsIlJPTEVfRERfUFVKQV9DQVNISUVSIiwiUk9MRV9ERF9QVUpBX01BTkFHRVIiLCJST0xFX0RJVklORV9GUkFOQ0hJU0VFX0NBU0hJRVIiLCJST0xFX1JPT1QiLCJST0xFX0REX1BVSkFfQURNSU4iLCJST0xFX0REQVBQX0FETUlOIiwiUk9MRV9ESVZJTkVfRlJBTkNISVNFRV9PUEVSQVRPUiIsIlJPTEVfRElWSU5FX0FETUlOIiwiUk9MRV9EREFQUF9TVVBQT1JUIiwiUk9MRV9ESVZJTkVfRlJBTkNISVNFRV9BQ0NPVU5UQU5UIiwiUk9MRV9ESVZJTkVfRlJBTkNISVNFRV9NQU5BR0VSIiwiUk9MRV9ESVZJTkVfRlJBTkNISVNFRSIsIlJPTEVfRERBUFBfQ09OVEVOVF9NQU5BR0VSIiwiUk9MRV9BRE1JTiIsIlJPTEVfRERfUFVKQV9NT0RFUkFUT1IiXSwianRpIjoid0p0bVRhcXY4XzgtclZJdGxmSFRFN0ZBaENJIiwiY2xpZW50X2lkIjoidGVjaHhyIiwic2NvcGUiOlsiYWxsIl19.FgSj0W-kVNfDw8we6LE3Z8i-8wG9EUBQcg1kjXyvY1QIzbfkx3QJJ3_lRMH_bpD2gQ6zEBzWhc1N0S73DGLxLJLXLPq2wiXEJPLkAYNaQkHtxjZSc8JoYlweYO0zYqjeYkAjYt--PtI744eiSQBr-_iQXtIZMG-ZYJJQXJz4sl2okovQYFRzJWAueVVXPByJxguV6SQ1Saz72E56_Rb7TAx81QSA1A36yrOAmT3gwsGgfBo-FFOfZfwVffR_4oKlJXpJZD5mnE_J9buzk7qvMcKnA3YhbaIuB_vDZH3sERHGhAqAHlDH3wEuTB2-3cYaZF_r7G7TjzRmrlDPZzeyxg`;
+
+// Data cache for category switching
+const dataCache = new Map();
+
+// Loading spinner component
+const LoadingSpinner = () => (
+  <div style={LOADING_STYLES}>
+    <style>
+      {`@keyframes spin { to { transform: rotate(360deg); } }`}
+    </style>
+    <div style={SPINNER_STYLES} />
+    <span>Loading reels...</span>
+  </div>
+);
 
 function App() {
   const [data, setData] = useState(null);
@@ -55,6 +81,8 @@ function App() {
   const [error, setError] = useState(null);
   const [category, setCategory] = useState('Stories');
   const [windowHeight, setWindowHeight] = useState(() => typeof window !== 'undefined' ? window.innerHeight : 300);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const abortControllerRef = useRef(null);
 
   // Handle window resize for baseWidth calculation
   useEffect(() => {
@@ -66,17 +94,70 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Prefetch other categories in background
+  useEffect(() => {
+    const prefetchCategories = ['Stories', 'Pravachan', 'Bhajan', 'Darshan'];
+    
+    const prefetch = async (cat) => {
+      if (dataCache.has(cat)) return;
+      
+      try {
+        const response = await fetch(
+          `https://devgateway.techxrdev.in/api/content/content/reels/feed?category=${cat}&page=1&limit=50&userId=12`,
+          {
+            headers: {
+              'Authorization': `Bearer ${authToken}`
+            }
+          }
+        );
+        
+        if (response.ok) {
+          const result = await response.json();
+          dataCache.set(cat, result);
+        }
+      } catch (err) {
+        // Silent fail for prefetch
+      }
+    };
+
+    // Prefetch after initial load with delay
+    const timer = setTimeout(() => {
+      prefetchCategories.forEach((cat, index) => {
+        setTimeout(() => prefetch(cat), index * 1000);
+      });
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
+      // Check cache first
+      if (dataCache.has(category)) {
+        setData(dataCache.get(category));
+        setLoading(false);
+        setError(null);
+        return;
+      }
+
+      // Abort previous request if any
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      
+      abortControllerRef.current = new AbortController();
+      
       try {
         setLoading(true);
+        setIsTransitioning(true);
         
         const response = await fetch(
           `https://devgateway.techxrdev.in/api/content/content/reels/feed?category=${category}&page=1&limit=50&userId=12`,
           {
             headers: {
               'Authorization': `Bearer ${authToken}`
-            }
+            },
+            signal: abortControllerRef.current.signal
           }
         );
         
@@ -85,18 +166,30 @@ function App() {
         }
         
         const result = await response.json();
+        
+        // Cache the result
+        dataCache.set(category, result);
+        
         setData(result);
         setError(null);
       } catch (err) {
+        if (err.name === 'AbortError') return;
         setError(err.message);
         setData(null);
         console.error('Error fetching reels:', err);
       } finally {
         setLoading(false);
+        setIsTransitioning(false);
       }
     };
 
     fetchData();
+    
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, [category]);
 
   // Extract videoUrl array from API response - memoized to avoid recalculation
@@ -111,11 +204,7 @@ function App() {
 
   // Show loading state
   if (loading) {
-    return (
-      <div style={LOADING_STYLES}>
-        Loading reels...
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   // Show error state
@@ -142,7 +231,7 @@ function App() {
         category={category} 
         onChange={handleCategoryChange}
       />
-      <Carousel 
+      <OptimizedCarousel 
         key={category}
         baseWidth={windowHeight}
         items={videoUrls}
